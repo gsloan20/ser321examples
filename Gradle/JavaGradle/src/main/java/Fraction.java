@@ -19,7 +19,7 @@ public class Fraction {
    
    public Fraction(int numerator, int demoninator) {
       this.numerator = numerator;
-      this.demoninator = demoninator;
+      this.denominator = denominator;
    }
 
    public void print() {
