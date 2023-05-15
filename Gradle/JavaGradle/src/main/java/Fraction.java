@@ -16,6 +16,11 @@ public class Fraction {
    public Fraction(){
       numerator = denominator = 0;
    }
+   
+   public Fraction(int numerator, int demoninator) {
+      this.numerator = numerator;
+      this.demoninator = demoninator;
+   }
 
    public void print() {
     System.out.print(numerator + "/" + denominator );
@@ -41,7 +46,17 @@ public class Fraction {
       try {
          // create a new instance
          // Fraction *frac = [[Fraction alloc] init];
-         Fraction frac = new Fraction();
+         
+         if(args.length != 2) {
+            System.out.println("Please provide numerator and denominator");
+            return;
+         }
+         int numerator = Integer.parseInt(args[0]);
+         int denominator = Integer.parseInt(args[1]);
+         
+         Fraction frac = new Fraction(numerator, denominator);
+         
+         
 
          // set the values
          frac.setNumerator(1);
