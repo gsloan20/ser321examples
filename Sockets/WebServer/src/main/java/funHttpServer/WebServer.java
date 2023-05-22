@@ -27,8 +27,6 @@ import java.util.LinkedHashMap;
 import java.nio.charset.Charset;
 import org.json.*;
 
-
-
 class WebServer {
   public static void main(String args[]) {
     WebServer server = new WebServer(9000);
@@ -64,7 +62,6 @@ class WebServer {
         try {
           server.close();
         } catch (IOException e) {
-          // TODO Auto-generated catch block
           e.printStackTrace();
         }
       }
@@ -150,7 +147,7 @@ class WebServer {
         } else if (request.equalsIgnoreCase("json")) {
           // shows the JSON of a random image and sets the header name for that image
 
-          // pick a index from the map
+          // pick an index from the map
           int index = random.nextInt(_images.size());
 
           // pull out the information
@@ -181,7 +178,7 @@ class WebServer {
         } else if (request.contains("file/")) {
           // tries to find the specified file and shows it or shows an error
 
-          // take the path and clean it. try to open the file
+          // take the path and clean it, then try to open the file
           File file = new File(request.replace("file/", ""));
 
           // Generate response
@@ -197,128 +194,129 @@ class WebServer {
             builder.append("File not found: " + file);
           }
         } else if (request.contains("multiply?")) {
-    Map<String, String> queryPairs = splitQuery(request.replace("multiply?", ""));
+          Map<String, String> queryPairs = splitQuery(request.replace("multiply?", ""));
 
-    // Check if both num1 and num2 parameters exist
-    if (queryPairs.containsKey("num1") && queryPairs.containsKey("num2")) {
-           try {
-               // Parse the parameters as integers
-               int num1 = Integer.parseInt(queryPairs.get("num1"));
-               int num2 = Integer.parseInt(queryPairs.get("num2"));
+          // Check if both num1 and num2 parameters exist
+          if (queryPairs.containsKey("num1") && queryPairs.containsKey("num2")) {
+            try {
+              // Parse the parameters as integers
+              int num1 = Integer.parseInt(queryPairs.get("num1"));
+              int num2 = Integer.parseInt(queryPairs.get("num2"));
 
-               // Perform the multiplication
-               int result = num1 * num2;
+              // Perform the multiplication
+              int result = num1 * num2;
 
-               // Generate a successful response
-               builder.append("HTTP/1.1 200 OK\n");
-               builder.append("Content-Type: text/html; charset=utf-8\n");
-               builder.append("\n");
-               builder.append("Result is: ").append(result);
-           } catch (NumberFormatException e) {
-               // Handle the case where the parameters cannot be parsed as integers
-               builder.append("HTTP/1.1 400 Bad Request\n");
-               builder.append("Content-Type: text/plain; charset=utf-8\n");
-               builder.append("\n");
-               builder.append("Invalid input. Both num1 and num2 must be integers.");
-           }
+              // Generate a successful response
+              builder.append("HTTP/1.1 200 OK\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("Result is: ").append(result);
+            } catch (NumberFormatException e) {
+              // Handle the case where the parameters cannot be parsed as integers
+              builder.append("HTTP/1.1 400 Bad Request\n");
+              builder.append("Content-Type: text/plain; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("Invalid input. Both num1 and num2 must be integers.");
+            }
           } else {
-           // Handle the case where one or both parameters are missing
-           builder.append("HTTP/1.1 400 Bad Request\n");
-           builder.append("Content-Type: text/plain; charset=utf-8\n");
-           builder.append("\n");
-           builder.append("Both num1 and num2 parameters are required.");
-       }
+            // Handle the case where one or both parameters are missing
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/plain; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Both num1 and num2 parameters are required.");
+          }
 
 
         } else if (request.contains("github?")) {
-             Map<String, String> queryPairs = splitQuery(request.replace("github?", ""));
-             String query = queryPairs.get("query");
+          Map<String, String> queryPairs = splitQuery(request.replace("github?", ""));
+          String query = queryPairs.get("query");
 
-             try {
-                 String apiUrl = "https://api.github.com/" + query;
-                 String json = fetchURL(apiUrl);
+          try {
+            String apiUrl = "https://api.github.com/" + query;
+            String json = fetchURL(apiUrl);
 
-                 // Parse the JSON response
-                 JSONArray reposArray = new JSONArray(json);
-                 StringBuilder responseBuilder = new StringBuilder();
+            // Parse the JSON response
+            JSONArray reposArray = new JSONArray(json);
+            StringBuilder responseBuilder = new StringBuilder();
 
-                 for (int i = 0; i < reposArray.length(); i++) {
-                     JSONObject repoObject = reposArray.getJSONObject(i);
+            for (int i = 0; i < reposArray.length(); i++) {
+              JSONObject repoObject = reposArray.getJSONObject(i);
 
-                     // Extract the required information
-                     String fullName = repoObject.getString("full_name");
-                     int repoId = repoObject.getInt("id");
-                     JSONObject ownerObject = repoObject.getJSONObject("owner");
-                     String ownerLogin = ownerObject.getString("login");
+              // Extract the required information
+              String fullName = repoObject.getString("full_name");
+              int repoId = repoObject.getInt("id");
+              JSONObject ownerObject = repoObject.getJSONObject("owner");
+              String ownerLogin = ownerObject.getString("login");
 
-                     // Append the information to the response
-                     responseBuilder.append("Full Name: ").append(fullName).append("<br>");
-                     responseBuilder.append("Repo ID: ").append(repoId).append("<br>");
-                     responseBuilder.append("Owner Login: ").append(ownerLogin).append("<br>");
-                     responseBuilder.append("<br>");
-                 } catch (JSONException e) {
-                 // Handle JSON exception when parsing the response
-                 builder.append("HTTP/1.1 500 Internal Server Error\n");
-                 builder.append("Content-Type: text/plain; charset=utf-8\n");
-                 builder.append("\n");
-                 builder.append("Error parsing JSON response.");
-                  }
-                 // Generate a successful response
-                 String response1 = responseBuilder.toString();
+              // Append the information to the response
+              responseBuilder.append("Full Name: ").append(fullName).append("<br>");
+              responseBuilder.append("Repo ID: ").append(repoId).append("<br>");
+              responseBuilder.append("Owner Login: ").append(ownerLogin).append("<br>");
+              responseBuilder.append("<br>");
+            }
 
-                 builder.append("HTTP/1.1 200 OK\n");
-                 builder.append("Content-Type: text/html; charset=utf-8\n");
-                 builder.append("\n");
-                 builder.append(response);
-           
-           
+            // Generate a successful response
+            String response = responseBuilder.toString();
+
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append(response);
+          } catch (JSONException e) {
+            // Handle JSON exception when parsing the response
+            builder.append("HTTP/1.1 500 Internal Server Error\n");
+            builder.append("Content-Type: text/plain; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Error parsing JSON response.");
+          }
+
         } else if (request.contains("reverse?")) {
-                Map<String, String> queryPairs = splitQuery(request.replace("reverse?", ""));
+          Map<String, String> queryPairs = splitQuery(request.replace("reverse?", ""));
 
-                try {
-                    // Check if the input string parameter exists
-                    if (queryPairs.containsKey("input")) {
-                        String input = queryPairs.get("input");
-                        String reversed = new StringBuilder(input).reverse().toString();
+          try {
+            // Check if the input string parameter exists
+            if (queryPairs.containsKey("input")) {
+              String input = queryPairs.get("input");
+              String reversed = new StringBuilder(input).reverse().toString();
 
-                        builder.append("HTTP/1.1 200 OK\n");
-                        builder.append("Content-Type: text/html; charset=utf-8\n");
-                        builder.append("\n");
-                        builder.append("Reversed string: ").append(reversed);
-                    } else {
-                        throw new IllegalArgumentException("Input parameter is required.");
-                    }
-                } catch (IllegalArgumentException e) {
-                    // Handle missing parameters
-                    builder.append("HTTP/1.1 400 Bad Request\n");
-                    builder.append("Content-Type: text/plain; charset=utf-8\n");
-                    builder.append("\n");
-                    builder.append(e.getMessage());
-                }
-         } else if (request.contains("stringlength?")) {
-             Map<String, String> queryPairs = splitQuery(request.replace("stringlength?", ""));
+              builder.append("HTTP/1.1 200 OK\n");
+              builder.append("Content-Type: text/html; charset=utf-8\n");
+              builder.append("\n");
+              builder.append("Reversed string: ").append(reversed);
+            } else {
+              throw new IllegalArgumentException("Input parameter is required.");
+            }
+          } catch (IllegalArgumentException e) {
+            // Handle missing parameters
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/plain; charset=utf-8\n");
+            builder.append("\n");
+            builder.append(e.getMessage());
+          }
+        } else if (request.contains("stringlength?")) {
+          Map<String, String> queryPairs = splitQuery(request.replace("stringlength?", ""));
 
-             // Check if at least two strings are provided
-             if (queryPairs.size() >= 2) {
-                 int totalLength = 0;
+          // Check if at least two strings are provided
+          if (queryPairs.size() >= 2) {
+            int totalLength = 0;
 
-                 for (String value : queryPairs.values()) {
-                     totalLength += value.length();
-                 }
+            for (String value : queryPairs.values()) {
+              totalLength += value.length();
+            }
 
-                 // Generate a successful response
-                 builder.append("HTTP/1.1 200 OK\n");
-                 builder.append("Content-Type: text/html; charset=utf-8\n");
-                 builder.append("\n");
-                 builder.append("Total Length is: ").append(totalLength);
-             } else {
-                 // Handle the case where less than two strings are provided
-                 builder.append("HTTP/1.1 400 Bad Request\n");
-                 builder.append("Content-Type: text/plain; charset=utf-8\n");
-                 builder.append("\n");
-                 builder.append("At least two strings are required.");
-             }
-      } else {
+            // Generate a successful response
+            builder.append("HTTP/1.1 200 OK\n");
+            builder.append("Content-Type: text/html; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("Total Length is: ").append(totalLength);
+          } else {
+            // Handle the case where less than two strings are provided
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/plain; charset=utf-8\n");
+            builder.append("\n");
+            builder.append("At least two strings are required.");
+          }
+        } else {
           // if the request is not recognized at all
 
           builder.append("HTTP/1.1 400 Bad Request\n");
@@ -365,7 +363,7 @@ class WebServer {
   public static String buildFileList() {
     ArrayList<String> filenames = new ArrayList<>();
 
-    // Creating a File object for directory
+    // Creating a File object for the directory
     File directoryPath = new File("www/");
     filenames.addAll(Arrays.asList(directoryPath.list()));
 
@@ -373,7 +371,7 @@ class WebServer {
       StringBuilder builder = new StringBuilder();
       builder.append("<ul>\n");
       for (var filename : filenames) {
-        builder.append("<li>" + filename + "</li>");
+        builder.append("<li>").append(filename).append("</li>");
       }
       builder.append("</ul>\n");
       return builder.toString();
@@ -407,12 +405,12 @@ class WebServer {
 
   /**
    *
-   * a method to make a web request. Note that this method will block execution
+   * A method to make a web request. Note that this method will block execution
    * for up to 20 seconds while the request is being satisfied. Better to use a
    * non-blocking request.
    * 
-   * @param aUrl the String indicating the query url for the OMDb api search
-   * @return the String result of the http request.
+   * @param aUrl the String indicating the query URL for the OMDb API search
+   * @return the String result of the HTTP request.
    *
    **/
   public String fetchURL(String aUrl) {
@@ -429,7 +427,7 @@ class WebServer {
         BufferedReader br = new BufferedReader(in);
         if (br != null) {
           int ch;
-          // read the next character until end of reader
+          // read the next character until the end of the reader
           while ((ch = br.read()) != -1) {
             sb.append((char) ch);
           }
@@ -438,7 +436,7 @@ class WebServer {
       }
       in.close();
     } catch (Exception ex) {
-      System.out.println("Exception in url request:" + ex.getMessage());
+      System.out.println("Exception in URL request:" + ex.getMessage());
     }
     return sb.toString();
   }
