@@ -25,6 +25,11 @@ import java.util.Random;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.nio.charset.Charset;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONException;
+
+
 
 class WebServer {
   public static void main(String args[]) {
@@ -256,7 +261,7 @@ class WebServer {
                  }
 
                  // Generate a successful response
-                 String response = responseBuilder.toString();
+                 String response1 = responseBuilder.toString();
 
                  builder.append("HTTP/1.1 200 OK\n");
                  builder.append("Content-Type: text/html; charset=utf-8\n");
