@@ -256,8 +256,13 @@ class WebServer {
                      responseBuilder.append("Repo ID: ").append(repoId).append("<br>");
                      responseBuilder.append("Owner Login: ").append(ownerLogin).append("<br>");
                      responseBuilder.append("<br>");
-                 }
-
+                 } catch (JSONException e) {
+                 // Handle JSON exception when parsing the response
+                 builder.append("HTTP/1.1 500 Internal Server Error\n");
+                 builder.append("Content-Type: text/plain; charset=utf-8\n");
+                 builder.append("\n");
+                 builder.append("Error parsing JSON response.");
+                  }
                  // Generate a successful response
                  String response1 = responseBuilder.toString();
 
@@ -265,16 +270,9 @@ class WebServer {
                  builder.append("Content-Type: text/html; charset=utf-8\n");
                  builder.append("\n");
                  builder.append(response);
-            catch (JSONException e) {
-                 // Handle JSON exception when parsing the response
-                 builder.append("HTTP/1.1 500 Internal Server Error\n");
-                 builder.append("Content-Type: text/plain; charset=utf-8\n");
-                 builder.append("\n");
-                 builder.append("Error parsing JSON response.");
-             }
            
-        }
-         else if (request.contains("reverse?")) {
+           
+        } else if (request.contains("reverse?")) {
                 Map<String, String> queryPairs = splitQuery(request.replace("reverse?", ""));
 
                 try {
