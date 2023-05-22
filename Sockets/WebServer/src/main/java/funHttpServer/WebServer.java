@@ -194,51 +194,136 @@ class WebServer {
             builder.append("File not found: " + file);
           }
         } else if (request.contains("multiply?")) {
-          // This multiplies two numbers, there is NO error handling, so when
-          // wrong data is given this just crashes
+    Map<String, String> queryPairs = splitQuery(request.replace("multiply?", ""));
 
-          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-          // extract path parameters
-          query_pairs = splitQuery(request.replace("multiply?", ""));
+    // Check if both num1 and num2 parameters exist
+    if (queryPairs.containsKey("num1") && queryPairs.containsKey("num2")) {
+           try {
+               // Parse the parameters as integers
+               int num1 = Integer.parseInt(queryPairs.get("num1"));
+               int num2 = Integer.parseInt(queryPairs.get("num2"));
 
-          // extract required fields from parameters
-          Integer num1 = Integer.parseInt(query_pairs.get("num1"));
-          Integer num2 = Integer.parseInt(query_pairs.get("num2"));
+               // Perform the multiplication
+               int result = num1 * num2;
 
-          // do math
-          Integer result = num1 * num2;
+               // Generate a successful response
+               builder.append("HTTP/1.1 200 OK\n");
+               builder.append("Content-Type: text/html; charset=utf-8\n");
+               builder.append("\n");
+               builder.append("Result is: ").append(result);
+           } catch (NumberFormatException e) {
+               // Handle the case where the parameters cannot be parsed as integers
+               builder.append("HTTP/1.1 400 Bad Request\n");
+               builder.append("Content-Type: text/plain; charset=utf-8\n");
+               builder.append("\n");
+               builder.append("Invalid input. Both num1 and num2 must be integers.");
+           }
+          } else {
+           // Handle the case where one or both parameters are missing
+           builder.append("HTTP/1.1 400 Bad Request\n");
+           builder.append("Content-Type: text/plain; charset=utf-8\n");
+           builder.append("\n");
+           builder.append("Both num1 and num2 parameters are required.");
+       }
 
-          // Generate response
-          builder.append("HTTP/1.1 200 OK\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append("Result is: " + result);
-
-          // TODO: Include error handling here with a correct error code and
-          // a response that makes sense
 
         } else if (request.contains("github?")) {
-          // pulls the query from the request and runs it with GitHub's REST API
-          // check out https://docs.github.com/rest/reference/
-          //
-          // HINT: REST is organized by nesting topics. Figure out the biggest one first,
-          //     then drill down to what you care about
-          // "Owner's repo is named RepoName. Example: find RepoName's contributors" translates to
-          //     "/repos/OWNERNAME/REPONAME/contributors"
+             Map<String, String> queryPairs = splitQuery(request.replace("github?", ""));
+             String query = queryPairs.get("query");
 
-          Map<String, String> query_pairs = new LinkedHashMap<String, String>();
-          query_pairs = splitQuery(request.replace("github?", ""));
-          String json = fetchURL("https://api.github.com/" + query_pairs.get("query"));
-          System.out.println(json);
+             try {
+                 String apiUrl = "https://api.github.com/" + query;
+                 String json = fetchURL(apiUrl);
 
-          builder.append("HTTP/1.1 200 OK\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append("Check the todos mentioned in the Java source file");
-          // TODO: Parse the JSON returned by your fetch and create an appropriate
-          // response based on what the assignment document asks for
+                 // Parse the JSON response
+                 JSONArray reposArray = new JSONArray(json);
+                 StringBuilder responseBuilder = new StringBuilder();
 
-        } else {
+                 for (int i = 0; i < reposArray.length(); i++) {
+                     JSONObject repoObject = reposArray.getJSONObject(i);
+
+                     // Extract the required information
+                     String fullName = repoObject.getString("full_name");
+                     int repoId = repoObject.getInt("id");
+                     JSONObject ownerObject = repoObject.getJSONObject("owner");
+                     String ownerLogin = ownerObject.getString("login");
+
+                     // Append the information to the response
+                     responseBuilder.append("Full Name: ").append(fullName).append("<br>");
+                     responseBuilder.append("Repo ID: ").append(repoId).append("<br>");
+                     responseBuilder.append("Owner Login: ").append(ownerLogin).append("<br>");
+                     responseBuilder.append("<br>");
+                 }
+
+                 // Generate a successful response
+                 String response = responseBuilder.toString();
+
+                 builder.append("HTTP/1.1 200 OK\n");
+                 builder.append("Content-Type: text/html; charset=utf-8\n");
+                 builder.append("\n");
+                 builder.append(response);
+             } catch (IOException e) {
+                 // Handle IO exception when fetching data from the API
+                 builder.append("HTTP/1.1 500 Internal Server Error\n");
+                 builder.append("Content-Type: text/plain; charset=utf-8\n");
+                 builder.append("\n");
+                 builder.append("Error fetching data from GitHub API.");
+             } catch (JSONException e) {
+                 // Handle JSON exception when parsing the response
+                 builder.append("HTTP/1.1 500 Internal Server Error\n");
+                 builder.append("Content-Type: text/plain; charset=utf-8\n");
+                 builder.append("\n");
+                 builder.append("Error parsing JSON response.");
+             }
+           
+        }
+         else if (request.contains("reverse?")) {
+                Map<String, String> queryPairs = splitQuery(request.replace("reverse?", ""));
+
+                try {
+                    // Check if the input string parameter exists
+                    if (queryPairs.containsKey("input")) {
+                        String input = queryPairs.get("input");
+                        String reversed = new StringBuilder(input).reverse().toString();
+
+                        builder.append("HTTP/1.1 200 OK\n");
+                        builder.append("Content-Type: text/html; charset=utf-8\n");
+                        builder.append("\n");
+                        builder.append("Reversed string: ").append(reversed);
+                    } else {
+                        throw new IllegalArgumentException("Input parameter is required.");
+                    }
+                } catch (IllegalArgumentException e) {
+                    // Handle missing parameters
+                    builder.append("HTTP/1.1 400 Bad Request\n");
+                    builder.append("Content-Type: text/plain; charset=utf-8\n");
+                    builder.append("\n");
+                    builder.append(e.getMessage());
+                }
+         } else if (request.contains("stringlength?")) {
+             Map<String, String> queryPairs = splitQuery(request.replace("stringlength?", ""));
+
+             // Check if at least two strings are provided
+             if (queryPairs.size() >= 2) {
+                 int totalLength = 0;
+
+                 for (String value : queryPairs.values()) {
+                     totalLength += value.length();
+                 }
+
+                 // Generate a successful response
+                 builder.append("HTTP/1.1 200 OK\n");
+                 builder.append("Content-Type: text/html; charset=utf-8\n");
+                 builder.append("\n");
+                 builder.append("Total Length is: ").append(totalLength);
+             } else {
+                 // Handle the case where less than two strings are provided
+                 builder.append("HTTP/1.1 400 Bad Request\n");
+                 builder.append("Content-Type: text/plain; charset=utf-8\n");
+                 builder.append("\n");
+                 builder.append("At least two strings are required.");
+             }
+      } else {
           // if the request is not recognized at all
 
           builder.append("HTTP/1.1 400 Bad Request\n");
