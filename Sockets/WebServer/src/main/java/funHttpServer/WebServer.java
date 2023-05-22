@@ -256,12 +256,12 @@ class WebServer {
             }
 
             // Generate a successful response
-            String response = responseBuilder.toString();
+            String response1 = responseBuilder.toString();
 
             builder.append("HTTP/1.1 200 OK\n");
             builder.append("Content-Type: text/html; charset=utf-8\n");
             builder.append("\n");
-            builder.append(response);
+            builder.append(response1);
           } catch (JSONException e) {
             // Handle JSON exception when parsing the response
             builder.append("HTTP/1.1 500 Internal Server Error\n");
