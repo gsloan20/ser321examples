@@ -265,13 +265,7 @@ class WebServer {
                  builder.append("Content-Type: text/html; charset=utf-8\n");
                  builder.append("\n");
                  builder.append(response);
-             } catch (IOException e) {
-                 // Handle IO exception when fetching data from the API
-                 builder.append("HTTP/1.1 500 Internal Server Error\n");
-                 builder.append("Content-Type: text/plain; charset=utf-8\n");
-                 builder.append("\n");
-                 builder.append("Error fetching data from GitHub API.");
-             } catch (JSONException e) {
+            catch (JSONException e) {
                  // Handle JSON exception when parsing the response
                  builder.append("HTTP/1.1 500 Internal Server Error\n");
                  builder.append("Content-Type: text/plain; charset=utf-8\n");
