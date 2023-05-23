@@ -302,7 +302,6 @@ class WebServer {
              builder.append("Content-Type: text/plain; charset=utf-8\n");
              builder.append("\n");
              builder.append("Invalid request format.");
-              return response;
            }
            else {
               Map<String, String> queryPairs = splitQuery(request.replace("stringlength?", ""));
