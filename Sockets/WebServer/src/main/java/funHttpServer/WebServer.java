@@ -345,7 +345,7 @@ class WebServer {
       response = ("<html>ERROR: " + e.getMessage() + "</html>").getBytes();
     }
     catch (StringIndexOutOfBoundsException e) {
-      response = ("<html>ERROR: " + e.getMessage() + "</html>").getBytes();
+      response = ("<html>ERROR: " + e.getMessage() + "<br> Please enter valid query" + "</html>").getBytes();
     }
 
     return response;
