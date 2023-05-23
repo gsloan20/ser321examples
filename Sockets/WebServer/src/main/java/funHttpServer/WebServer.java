@@ -300,6 +300,15 @@ class WebServer {
             builder.append(e.getMessage());
            }
         } else if (request.contains("stringlength?")) {
+           
+           if (queryString.equals(request)) {
+             builder.append("HTTP/1.1 400 Bad Request\n");
+             builder.append("Content-Type: text/plain; charset=utf-8\n");
+             builder.append("\n");
+             builder.append("Invalid request format.");
+              return result;
+           }
+
           Map<String, String> queryPairs = splitQuery(request.replace("stringlength?", ""));
 
           // Check if at least two strings are provided
