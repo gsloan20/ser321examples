@@ -325,6 +325,8 @@ class WebServer {
               }
            }
 
+           
+
           
         } else {
           // if the request is not recognized at all
@@ -340,6 +342,9 @@ class WebServer {
       }
     } catch (IOException e) {
       e.printStackTrace();
+      response = ("<html>ERROR: " + e.getMessage() + "</html>").getBytes();
+    }
+    catch (StringIndexOutOfBoundsException e) {
       response = ("<html>ERROR: " + e.getMessage() + "</html>").getBytes();
     }
 
