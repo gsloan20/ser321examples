@@ -301,12 +301,14 @@ class WebServer {
            }
         } else if (request.contains("stringlength?")) {
            
+           String queryString = request.replace("stringlength?", "");
+           
            if (queryString.equals(request)) {
              builder.append("HTTP/1.1 400 Bad Request\n");
              builder.append("Content-Type: text/plain; charset=utf-8\n");
              builder.append("\n");
              builder.append("Invalid request format.");
-              return result;
+              return response;
            }
 
           Map<String, String> queryPairs = splitQuery(request.replace("stringlength?", ""));
