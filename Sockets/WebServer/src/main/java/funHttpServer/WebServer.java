@@ -293,12 +293,6 @@ class WebServer {
             builder.append("\n");
             builder.append(e.getMessage());
           }
-           catch(StringIndexOutOfBoundsException e) {
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/plain; charset=utf-8\n");
-            builder.append("\n");
-            builder.append(e.getMessage());
-           }
         } else if (request.contains("stringlength?")) {
            
            String queryString = request.replace("stringlength?", "");
@@ -310,29 +304,32 @@ class WebServer {
              builder.append("Invalid request format.");
               return response;
            }
+           else {
+              Map<String, String> queryPairs = splitQuery(request.replace("stringlength?", ""));
 
-          Map<String, String> queryPairs = splitQuery(request.replace("stringlength?", ""));
+              // Check if at least two strings are provided
+              if (queryPairs.size() >= 2) {
+                int totalLength = 0;
 
-          // Check if at least two strings are provided
-          if (queryPairs.size() >= 2) {
-            int totalLength = 0;
+                for (String value : queryPairs.values()) {
+                  totalLength += value.length();
+                }
 
-            for (String value : queryPairs.values()) {
-              totalLength += value.length();
-            }
+                // Generate a successful response
+                builder.append("HTTP/1.1 200 OK\n");
+                builder.append("Content-Type: text/html; charset=utf-8\n");
+                builder.append("\n");
+                builder.append("Total Length is: ").append(totalLength);
+              } else {
+                // Handle the case where less than two strings are provided
+                builder.append("HTTP/1.1 400 Bad Request\n");
+                builder.append("Content-Type: text/plain; charset=utf-8\n");
+                builder.append("\n");
+                builder.append("At least two strings are required.");
+              }
+           }
 
-            // Generate a successful response
-            builder.append("HTTP/1.1 200 OK\n");
-            builder.append("Content-Type: text/html; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("Total Length is: ").append(totalLength);
-          } else {
-            // Handle the case where less than two strings are provided
-            builder.append("HTTP/1.1 400 Bad Request\n");
-            builder.append("Content-Type: text/plain; charset=utf-8\n");
-            builder.append("\n");
-            builder.append("At least two strings are required.");
-          }
+          
         } else {
           // if the request is not recognized at all
 
