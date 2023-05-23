@@ -293,6 +293,12 @@ class WebServer {
             builder.append("\n");
             builder.append(e.getMessage());
           }
+           catch(StringIndexOutOfBoundsException e) {
+            builder.append("HTTP/1.1 400 Bad Request\n");
+            builder.append("Content-Type: text/plain; charset=utf-8\n");
+            builder.append("\n");
+            builder.append(e.getMessage());
+           }
         } else if (request.contains("stringlength?")) {
           Map<String, String> queryPairs = splitQuery(request.replace("stringlength?", ""));
 
