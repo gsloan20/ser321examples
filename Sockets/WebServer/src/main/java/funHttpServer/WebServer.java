@@ -343,13 +343,11 @@ class WebServer {
     } catch (IOException e) {
       e.printStackTrace();
       response = ("<html>ERROR: " + e.getMessage() + "</html>").getBytes();
+      
     }
     catch (StringIndexOutOfBoundsException e) {
-        StringBuilder builder = new StringBuilder();
-          builder.append("HTTP/1.1 400 Bad Request\n");
-          builder.append("Content-Type: text/html; charset=utf-8\n");
-          builder.append("\n");
-          builder.append("I am not sure what you want me to do...");
+      response = ("<html>ERROR: " + e.getMessage() + "<br> Please enter valid query" + "</html>").getBytes();
+      return response;
     }
 
     return response;
